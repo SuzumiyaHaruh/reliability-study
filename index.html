@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可靠性测试工程师学习系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部主导航 -->
+        <header class="header header-main">
+            <div class="header-left">
+                <h1>🛠️ 可靠性测试工程师</h1>
+                <span class="subtitle">初级 + 高级 · 12+10 主题 · 240+ 习题 · 70+ 公式</span>
+            </div>
+            <nav class="main-nav">
+                <a class="main-nav-item active" data-view="home">🏠 首页</a>
+                <a class="main-nav-item" data-view="basic">📚 初级教程</a>
+                <a class="main-nav-item" data-view="advanced">🚀 高级教程</a>
+                <a class="main-nav-item" data-view="formulas">📐 公式库</a>
+            </nav>
+            <div class="header-right">
+                <button class="btn-icon" id="btn-stats" title="统计">📊</button>
+                <button class="btn-icon" id="btn-wrongbook" title="错题本">📕</button>
+                <button class="btn-icon" id="btn-settings" title="设置">⚙️</button>
+            </div>
+        </header>
+
+        <div class="main">
+            <!-- 侧边栏（动态生成） -->
+            <aside class="sidebar" id="sidebar"></aside>
+
+            <!-- 主内容区 -->
+            <main class="content">
+                <!-- 欢迎页 -->
+                <div class="welcome" id="welcome">
+                    <div class="welcome-icon">🎓</div>
+                    <h2>欢迎来到可靠性测试工程师学习系统</h2>
+                    <p class="welcome-desc">从初级工程师到高级可靠性专家 · 系统化学习路径</p>
+
+                    <div class="welcome-modules">
+                        <div class="module-card" data-view="basic">
+                            <div class="module-icon">📚</div>
+                            <div class="module-title">初级教程</div>
+                            <div class="module-desc">3 个月 12 周完整学习路径</div>
+                            <div class="module-meta">165 道题 · 40 公式</div>
+                        </div>
+                        <div class="module-card" data-view="advanced">
+                            <div class="module-icon">🚀</div>
+                            <div class="module-title">高级教程</div>
+                            <div class="module-desc">系统建模、PoF、认证备考</div>
+                            <div class="module-meta">10 大主题 · 80+ 题</div>
+                        </div>
+                        <div class="module-card" data-view="formulas">
+                            <div class="module-icon">📐</div>
+                            <div class="module-title">公式库</div>
+                            <div class="module-desc">70+ 公式通俗讲解</div>
+                            <div class="module-meta">可搜索 · 分类浏览</div>
+                        </div>
+                    </div>
+
+                    <div class="welcome-actions">
+                        <button class="btn btn-primary btn-lg" id="btn-start">开始学习 →</button>
+                    </div>
+                </div>
+
+                <!-- 初级课程页（保留原题库功能） -->
+                <div class="basic-page" id="basic-page" style="display:none">
+                    <div class="page-header">
+                        <h2>📚 初级教程（3 个月 12 周）</h2>
+                        <p>从零开始，系统掌握可靠性测试工程师核心技能</p>
+                    </div>
+                    <div class="page-content" id="basic-content">
+                        <!-- 由 JS 渲染 12 周 -->
+                    </div>
+                </div>
+
+                <!-- 高级课程页（新课程展示） -->
+                <div class="advanced-page" id="advanced-page" style="display:none">
+                    <div class="page-header">
+                        <h2>🚀 高级可靠性工程师教程</h2>
+                        <p>系统建模、失效物理、软件可靠性、认证备考</p>
+                    </div>
+                    <div class="advanced-modules" id="advanced-modules">
+                        <!-- 由 JS 渲染 10 主题 -->
+                    </div>
+                </div>
+
+                <!-- 课程详情页 -->
+                <div class="lesson-page" id="lesson-page" style="display:none">
+                    <div class="lesson-header">
+                        <button class="btn btn-secondary" id="btn-back-advanced">← 返回</button>
+                        <h2 id="lesson-title">课程标题</h2>
+                    </div>
+                    <div class="lesson-meta" id="lesson-meta"></div>
+                    <div class="lesson-content" id="lesson-content"></div>
+                    <div class="lesson-exercises" id="lesson-exercises">
+                        <h3>📝 配套习题</h3>
+                        <div id="lesson-questions"></div>
+                    </div>
+                </div>
+
+                <!-- 公式库页 -->
+                <div class="formulas-page" id="formulas-page" style="display:none">
+                    <div class="formulas-header">
+                        <h2>📐 公式通俗理解大全</h2>
+                        <p class="formulas-desc">70+ 可靠性核心公式，每条都有白话讲解和工程应用</p>
+                        <div class="formulas-search">
+                            <input type="text" id="formula-search" placeholder="搜索公式名称或关键词...">
+                        </div>
+                        <div class="formulas-categories" id="formulas-categories"></div>
+                    </div>
+                    <div class="formulas-list" id="formulas-list"></div>
+                </div>
+
+                <!-- 答题区 -->
+                <div class="quiz" id="quiz" style="display:none">
+                    <div class="quiz-header">
+                        <div class="quiz-info">
+                            <span class="quiz-week" id="quiz-week">第1周</span>
+                            <span class="quiz-progress" id="quiz-progress">1 / 20</span>
+                        </div>
+                        <div class="quiz-actions">
+                            <button class="btn btn-sm" id="btn-prev">← 上一题</button>
+                            <button class="btn btn-sm" id="btn-next">下一题 →</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-body">
+                        <div class="question-meta">
+                            <span class="question-type" id="q-type">单选题</span>
+                            <span class="question-difficulty" id="q-difficulty">⭐</span>
+                            <span class="question-day" id="q-day">Day 1</span>
+                        </div>
+
+                        <h2 class="question-title" id="q-title"></h2>
+                        <div class="question-case" id="q-case" style="display:none"></div>
+
+                        <div class="question-options" id="q-options"></div>
+
+                        <div class="question-fill" id="q-fill" style="display:none">
+                            <input type="text" id="q-fill-input" placeholder="请输入答案">
+                        </div>
+
+                        <div class="question-actions">
+                            <button class="btn btn-secondary" id="btn-submit">提交答案</button>
+                            <button class="btn btn-link" id="btn-show-answer">查看解析</button>
+                        </div>
+
+                        <div class="question-result" id="q-result" style="display:none">
+                            <div class="result-header" id="result-header"></div>
+                            <div class="result-explanation" id="result-explanation"></div>
+                            <div class="result-keypoint" id="result-keypoint"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 结果统计页 -->
+                <div class="result-page" id="result-page" style="display:none">
+                    <div class="result-icon" id="result-icon">🎉</div>
+                    <h2 id="result-title">练习完成！</h2>
+                    <div class="result-stats" id="result-stats"></div>
+                    <div class="result-actions">
+                        <button class="btn btn-primary" id="btn-restart">再来一次</button>
+                        <button class="btn btn-secondary" id="btn-back-home">返回首页</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 提示弹窗 -->
+    <div class="modal" id="modal" style="display:none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">提示</h3>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/data2.js"></script>
+    <script src="js/data3.js"></script>
+    <script src="js/data4.js"></script>
+    <script src="js/formulas.js"></script>
+    <script src="js/formulas_advanced.js"></script>
+    <script src="js/questions_advanced.js"></script>
+    <script src="js/advanced.js"></script>
+    <script src="js/advanced2.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
