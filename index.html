@@ -18,6 +18,7 @@
                 <a class="main-nav-item active" data-view="home">🏠 首页</a>
                 <a class="main-nav-item" data-view="basic">📚 初级教程</a>
                 <a class="main-nav-item" data-view="advanced">🚀 高级教程</a>
+                <a class="main-nav-item" data-view="env">🌡️ 环境试验</a>
                 <a class="main-nav-item" data-view="formulas">📐 公式库</a>
             </nav>
             <div class="header-right">
@@ -46,7 +47,7 @@
                         </div>
                     </div>
 
-                    <!-- 三大模块入口 -->
+                    <!-- 四大模块入口 -->
                     <div class="welcome-modules">
                         <div class="module-card" data-view="basic">
                             <div class="module-card-tag">入门</div>
@@ -71,6 +72,18 @@
                                 <div class="module-stat"><span class="num">80+</span>题</div>
                             </div>
                             <div class="module-cta">进入学习 →</div>
+                        </div>
+                        <div class="module-card" data-view="env">
+                            <div class="module-card-tag">速查</div>
+                            <div class="module-icon">🌡️</div>
+                            <div class="module-title">环境试验库</div>
+                            <div class="module-desc">25+ 环境试验项目完整说明，含标准、条件、失效、应用</div>
+                            <div class="module-stats">
+                                <div class="module-stat"><span class="num">28</span>项目</div>
+                                <div class="module-stat"><span class="num">7</span>分类</div>
+                                <div class="module-stat"><span class="num">100+</span>标准</div>
+                            </div>
+                            <div class="module-cta">立即查询 →</div>
                         </div>
                         <div class="module-card" data-view="formulas">
                             <div class="module-card-tag">速查</div>
@@ -212,6 +225,22 @@
                     <div class="formulas-list" id="formulas-list"></div>
                 </div>
 
+                <!-- 环境试验项目库 -->
+                <div class="env-page" id="env-page" style="display:none">
+                    <div class="env-hero">
+                        <div class="env-hero-icon">🌡️</div>
+                        <div>
+                            <h2>环境试验项目库</h2>
+                            <p>28 个环境试验项目完整说明 · 7 大类 · 100+ 标准 · 严酷等级·应用·失效模式</p>
+                        </div>
+                    </div>
+                    <div class="env-toolbar">
+                        <input type="text" id="env-search" placeholder="搜索试验项目、标准、应用...">
+                        <div class="env-categories" id="env-categories"></div>
+                    </div>
+                    <div class="env-list" id="env-list"></div>
+                </div>
+
                 <!-- 答题区 -->
                 <div class="quiz" id="quiz" style="display:none">
                     <div class="quiz-header">
@@ -290,6 +319,7 @@
     <script src="js/advanced.js"></script>
     <script src="js/advanced2.js"></script>
     <script src="js/basic_curriculum.js"></script>
+    <script src="js/environment_tests.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
