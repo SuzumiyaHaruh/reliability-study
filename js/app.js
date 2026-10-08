@@ -71,6 +71,8 @@ function bindEvents() {
 
     // 欢迎页
     document.getElementById('btn-start').addEventListener('click', () => switchView('basic'));
+    const heroFormulas = document.getElementById('btn-formulas-hero');
+    if (heroFormulas) heroFormulas.addEventListener('click', () => switchView('formulas'));
     document.querySelectorAll('.module-card, .welcome-features .feature-card').forEach(el => {
         el.addEventListener('click', () => {
             const view = el.dataset.view;
@@ -94,7 +96,14 @@ function bindEvents() {
     document.getElementById('btn-back-home').addEventListener('click', () => switchView('home'));
 
     // 课程详情返回
-    document.getElementById('btn-back-advanced').addEventListener('click', () => switchView('advanced'));
+    document.getElementById('btn-back-advanced').addEventListener('click', () => {
+        // 根据来源决定返回哪里
+        if (STATE.currentModule && STATE.currentModule.startsWith('basic-w')) {
+            switchView('basic');
+        } else {
+            switchView('advanced');
+        }
+    });
 
     // 模态框
     document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -142,10 +151,13 @@ function switchView(view) {
 // ========== 侧边栏更新 ==========
 function updateSidebar(view) {
     const sidebar = document.getElementById('sidebar');
-    if (view === 'home' || view === 'formulas') {
+    // 首页和公式库不显示侧边栏（公式库是搜索浏览界面，主导航够了）
+    if (view === 'home') {
         sidebar.innerHTML = '';
+        sidebar.style.display = 'none';
         return;
     }
+    sidebar.style.display = '';
 
     let html = `
         <div class="sidebar-header">
@@ -171,7 +183,10 @@ function updateSidebar(view) {
         </div>
     `;
 
-    if (view === 'basic') {
+    if (view === 'formulas') {
+        // 公式库侧边栏：分类导航
+        html += renderFormulasSidebar();
+    } else if (view === 'basic') {
         html += renderBasicNav();
     } else if (view === 'advanced') {
         html += renderAdvancedSidebar();
@@ -223,6 +238,27 @@ function renderBasicNav() {
     return html;
 }
 
+// 公式库侧边栏：分类快速跳转
+function renderFormulasSidebar() {
+    const cats = ['全部', ...new Set(FORMULAS.map(f => f.category))];
+    const counts = {};
+    cats.forEach(c => {
+        counts[c] = c === '全部' ? FORMULAS.length : FORMULAS.filter(f => f.category === c).length;
+    });
+
+    let html = '<nav class="nav"><div class="nav-section">';
+    html += '<div class="nav-section-title">📐 公式分类</div>';
+    cats.forEach(c => {
+        html += `<a class="nav-week" data-formula-cat="${c}">
+            <span class="nav-week-num">${c === '全部' ? '★' : c.substring(0,2)}</span>
+            <span class="nav-week-title">${c}</span>
+            <span class="nav-week-count">${counts[c]}</span>
+        </a>`;
+    });
+    html += '</div></nav>';
+    return html;
+}
+
 function renderAdvancedSidebar() {
     let html = '<nav class="nav">';
     Object.keys(ADVANCED_CURRICULUM).forEach(key => {
@@ -262,42 +298,200 @@ function bindSidebarEvents(view) {
                 if (mod && lesson) openLesson(mod, lesson);
             });
         });
+    } else if (view === 'formulas') {
+        document.querySelectorAll('.nav-week').forEach(el => {
+            el.addEventListener('click', () => {
+                const cat = el.dataset.formulaCat;
+                if (cat) {
+                    formulaState.category = cat;
+                    formulaState.keyword = '';
+                    renderFormulaCategories();
+                    renderFormulas();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
     }
 }
 
 // ========== 初级页 ==========
 function renderBasicPage() {
-    const groups = [
-        { title: '阶段一：基础理论', weeks: [1, 2, 3] },
-        { title: '阶段二：试验方法', weeks: [4, 5, 6] },
-        { title: '阶段三：分析技术', weeks: [7, 8, 9] },
-        { title: '阶段四：标准协作', weeks: [10, 11] },
-        { title: '阶段五：项目实战', weeks: [12] }
+    const stages = [
+        { title: '阶段一：基础理论', desc: '概率统计与可靠性数学基础', weeks: [
+            { w: 1, title: '概率统计速成', topics: ['随机事件与条件概率', '贝叶斯公式', '常用分布（指数/威布尔/正态）', '假设检验与回归'], color: '#3b82f6' },
+            { w: 2, title: '可靠性工程基础', topics: ['可靠性基本量 R/F/λ', '浴盆曲线三阶段', 'MTBF/MTTF/MTTR/可用度', '串联/并联/表决系统'], color: '#6366f1' },
+            { w: 3, title: '电子产品基础', topics: ['元器件失效模式', '降额设计原则', '焊点可靠性', 'FMEA 概念与实施'], color: '#8b5cf6' }
+        ]},
+        { title: '阶段二：试验方法', desc: '环境与机械试验方法', weeks: [
+            { w: 4, title: '环境试验', topics: ['高低温/温循/温冲', '湿热与盐雾', 'IP 防护等级', '试验设备原理'], color: '#06b6d4' },
+            { w: 5, title: '机械与寿命试验', topics: ['正弦/随机振动', '冲击与跌落', '三综合试验', '寿命试验设计'], color: '#0891b2' },
+            { w: 6, title: '加速试验', topics: ['HALT/HASS 原理', 'HAST 加速', 'Arrhenius 模型', 'Coffin-Manson 模型'], color: '#0e7490' }
+        ]},
+        { title: '阶段三：分析技术', desc: '可靠性分析核心方法', weeks: [
+            { w: 7, title: 'FMEA 深入', topics: ['DFMEA 实施', 'PFMEA 实施', 'AIAG-VDA 新版', '加速模型深入'], color: '#10b981' },
+            { w: 8, title: 'DOE 试验设计', topics: ['全因子与部分因子', '田口设计', '响应面方法', '样本量确定'], color: '#059669' },
+            { w: 9, title: '系统级分析', topics: ['FTA 故障树', '最小割集', '可靠性预计', '可靠性增长与筛选'], color: '#047857' }
+        ]},
+        { title: '阶段四：标准协作', desc: '标准体系与跨部门协作', weeks: [
+            { w: 10, title: '标准体系', topics: ['GB/T 2423 系列', 'MIL-STD-810', 'ISO 16750', 'AEC-Q 与其他行业'], color: '#f59e0b' },
+            { w: 11, title: '跨部门协作', topics: ['设计评审', '失效分析 FA', '8D 报告', 'CNAS/CMA 体系'], color: '#d97706' }
+        ]},
+        { title: '阶段五：项目实战', desc: '完整项目实践', weeks: [
+            { w: 12, title: '相机模组实战', topics: ['项目章程', '试验方案设计', '设备夹具', '数据分析与报告'], color: '#ef4444' }
+        ]}
     ];
 
-    let html = '';
-    groups.forEach(g => {
-        html += `<h3 style="margin: 20px 0 12px; color: var(--text);">${g.title}</h3>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">`;
-        g.weeks.forEach(w => {
+    const totalQ = Object.keys(QUESTION_BANK).filter(k => k <= 12).reduce((s, k) => s + QUESTION_BANK[k].length, 0);
+
+    let html = `
+        <div class="basic-hero">
+            <div class="basic-hero-icon">📚</div>
+            <div>
+                <h2>初级教程</h2>
+                <p>3 个月 12 周完整学习路径 · ${totalQ} 道配套习题 · 适合可靠性测试入门到胜任</p>
+            </div>
+        </div>
+    `;
+
+    stages.forEach((stage, idx) => {
+        html += `<div class="stage-section">
+            <div class="stage-header">
+                <div class="stage-num">${idx + 1}</div>
+                <div>
+                    <div class="stage-title">${stage.title}</div>
+                    <div class="stage-desc">${stage.desc}</div>
+                </div>
+            </div>
+            <div class="stage-weeks">`;
+
+        stage.weeks.forEach(weekInfo => {
+            const w = weekInfo.w;
             const count = (QUESTION_BANK[w] || []).length;
-            html += `<div class="feature-card" data-week="${w}" style="text-align:center; cursor:pointer;">
-                <div class="feature-icon">📅</div>
-                <div class="feature-title">第 ${w} 周</div>
-                <div class="feature-desc">${count} 道习题</div>
+            html += `<div class="week-card" data-week="${w}" style="--card-color: ${weekInfo.color}">
+                <div class="week-card-header">
+                    <div class="week-card-num">第${w}周</div>
+                    <div class="week-card-count">${count} 题</div>
+                </div>
+                <h3 class="week-card-title">${weekInfo.title}</h3>
+                <ul class="week-card-topics">
+                    ${weekInfo.topics.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+                <div class="week-card-cta">
+                    <span>开始学习</span>
+                    <span>→</span>
+                </div>
             </div>`;
         });
-        html += '</div>';
+
+        html += `</div></div>`;
     });
+
+    // 综合练习
+    html += `<div class="stage-section">
+        <div class="stage-header">
+            <div class="stage-num">⭐</div>
+            <div>
+                <div class="stage-title">综合练习</div>
+                <div class="stage-desc">检验学习成果</div>
+            </div>
+        </div>
+        <div class="stage-weeks">
+            <div class="week-card" data-mode="exam" style="--card-color: #8b5cf6">
+                <div class="week-card-header">
+                    <div class="week-card-num">🎯</div>
+                    <div class="week-card-count">30 题</div>
+                </div>
+                <h3 class="week-card-title">模拟考试</h3>
+                <p class="week-card-topics" style="list-style:none;padding:0">
+                    <li>30 道随机题</li>
+                    <li>限时完成</li>
+                    <li>综合能力评估</li>
+                </p>
+                <div class="week-card-cta"><span>开始考试</span><span>→</span></div>
+            </div>
+            <div class="week-card" data-mode="random" style="--card-color: #ec4899">
+                <div class="week-card-header">
+                    <div class="week-card-num">🎲</div>
+                    <div class="week-card-count">20 题</div>
+                </div>
+                <h3 class="week-card-title">随机抽题</h3>
+                <p class="week-card-topics" style="list-style:none;padding:0">
+                    <li>20 道随机题</li>
+                    <li>覆盖所有周</li>
+                    <li>碎片化练习</li>
+                </p>
+                <div class="week-card-cta"><span>立即抽题</span><span>→</span></div>
+            </div>
+        </div>
+    </div>`;
 
     document.getElementById('basic-content').innerHTML = html;
 
-    document.querySelectorAll('#basic-content .feature-card').forEach(el => {
+    // 绑定
+    document.querySelectorAll('#basic-content .week-card').forEach(el => {
         el.addEventListener('click', () => {
-            const w = parseInt(el.dataset.week);
-            startWeek(w);
+            const w = el.dataset.week;
+            const mode = el.dataset.mode;
+            if (mode === 'exam') startExam();
+            else if (mode === 'random') startRandom();
+            else if (w) openWeek(w);
         });
     });
+}
+
+// 打开周教学页
+function openWeek(week) {
+    const weekData = getWeekCurriculum(week);
+    if (!weekData) {
+        // 没有教材数据，至少进入答题
+        startWeek(week);
+        return;
+    }
+    STATE.currentWeek = week;
+    STATE.currentModule = 'basic-w' + week;
+    document.getElementById('lesson-title').textContent = `第 ${week} 周 · ${weekData.title}`;
+    document.getElementById('lesson-meta').textContent = `初级教程 · 12 周计划 · ${(QUESTION_BANK[week] || []).length} 道题`;
+    document.getElementById('lesson-content').innerHTML = renderMarkdown(weekData.content);
+
+    const qContainer = document.getElementById('lesson-questions');
+    const questions = QUESTION_BANK[week] || [];
+    if (questions.length > 0) {
+        qContainer.innerHTML = questions.map(q => `
+            <div class="lesson-q-item" data-qid="${q.id}">
+                <div class="lesson-q-title">${q.title}</div>
+                <div class="lesson-q-meta">${getTypeText(q.type)} · ${'⭐'.repeat(q.difficulty || 1)}</div>
+            </div>
+        `).join('');
+
+        qContainer.querySelectorAll('.lesson-q-item').forEach(el => {
+            el.addEventListener('click', () => {
+                startSingleQuestion(el.dataset.qid);
+            });
+        });
+
+        // 加一个"开始本周全部习题"按钮
+        const startAllBtn = document.createElement('button');
+        startAllBtn.className = 'btn btn-primary';
+        startAllBtn.style.cssText = 'margin-top: 16px; width: 100%;';
+        startAllBtn.textContent = `开始本周全部 ${questions.length} 道习题 →`;
+        startAllBtn.onclick = () => startWeek(week);
+        qContainer.appendChild(startAllBtn);
+    } else {
+        qContainer.innerHTML = '<p style="color: var(--text-muted);">暂无配套习题</p>';
+    }
+
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('basic-page').style.display = 'none';
+    document.getElementById('advanced-page').style.display = 'none';
+    document.getElementById('formulas-page').style.display = 'none';
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('result-page').style.display = 'none';
+    document.getElementById('lesson-page').style.display = 'block';
+}
+
+// 获取周教学数据
+function getWeekCurriculum(week) {
+    return BASIC_CURRICULUM[week] || null;
 }
 
 // ========== 高级页 ==========
@@ -457,8 +651,8 @@ function startSingleQuestion(qid) {
     const q = getQuestionById(qid);
     if (!q) return;
     STATE.currentMode = 'single';
-    STATE.currentWeek = null;
-    STATE.currentModule = STATE.currentModule;
+    STATE.currentWeek = q.week && q.week <= 12 ? q.week : null;
+    STATE.currentModule = STATE.currentModule || (q.week && q.week <= 12 ? 'basic-w' + q.week : null);
     STATE.currentLesson = STATE.currentLesson;
     STATE.currentQuestions = [q];
     STATE.currentIndex = 0;
@@ -468,7 +662,8 @@ function startSingleQuestion(qid) {
     STATE.wrongQuestions = [];
     STATE.startTime = Date.now();
 
-    document.getElementById('quiz-week').textContent = `高级·${STATE.currentModule}·${q.knowledge || '习题'}`;
+    const weekTitle = q.week && q.week <= 12 ? `初级·第${q.week}周` : `高级·${q.knowledge || '习题'}`;
+    document.getElementById('quiz-week').textContent = weekTitle;
     showQuiz();
     renderQuestion();
 }
@@ -710,6 +905,7 @@ function updateStats() {
     const total = correct + wrong;
     const accuracy = total > 0 ? Math.round(correct / total * 100) : 0;
 
+    // 侧边栏
     const el1 = document.getElementById('stat-answered');
     const el2 = document.getElementById('stat-correct');
     const el3 = document.getElementById('stat-wrong');
@@ -718,6 +914,16 @@ function updateStats() {
     if (el2) el2.textContent = correct;
     if (el3) el3.textContent = wrong;
     if (el4) el4.textContent = accuracy + '%';
+
+    // 首页
+    const h1 = document.getElementById('home-stat-answered');
+    const h2 = document.getElementById('home-stat-correct');
+    const h3 = document.getElementById('home-stat-wrong');
+    const h4 = document.getElementById('home-stat-accuracy');
+    if (h1) h1.textContent = answered;
+    if (h2) h2.textContent = correct;
+    if (h3) h3.textContent = wrong;
+    if (h4) h4.textContent = accuracy + '%';
 }
 
 function prevQuestion() {
