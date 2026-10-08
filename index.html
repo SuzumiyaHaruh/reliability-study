@@ -35,33 +35,131 @@
             <main class="content">
                 <!-- 欢迎页 -->
                 <div class="welcome" id="welcome">
-                    <div class="welcome-icon">🎓</div>
-                    <h2>欢迎来到可靠性测试工程师学习系统</h2>
-                    <p class="welcome-desc">从初级工程师到高级可靠性专家 · 系统化学习路径</p>
-
-                    <div class="welcome-modules">
-                        <div class="module-card" data-view="basic">
-                            <div class="module-icon">📚</div>
-                            <div class="module-title">初级教程</div>
-                            <div class="module-desc">3 个月 12 周完整学习路径</div>
-                            <div class="module-meta">165 道题 · 40 公式</div>
-                        </div>
-                        <div class="module-card" data-view="advanced">
-                            <div class="module-icon">🚀</div>
-                            <div class="module-title">高级教程</div>
-                            <div class="module-desc">系统建模、PoF、认证备考</div>
-                            <div class="module-meta">10 大主题 · 80+ 题</div>
-                        </div>
-                        <div class="module-card" data-view="formulas">
-                            <div class="module-icon">📐</div>
-                            <div class="module-title">公式库</div>
-                            <div class="module-desc">70+ 公式通俗讲解</div>
-                            <div class="module-meta">可搜索 · 分类浏览</div>
+                    <!-- Hero 区域 -->
+                    <div class="hero">
+                        <div class="hero-badge">可靠性工程师专业学习平台</div>
+                        <h1 class="hero-title">从入门到精通的<br>可靠性测试学习系统</h1>
+                        <p class="hero-desc">12 周初级教程 + 10 主题高级进阶 · 245+ 精选习题 · 70+ 公式通俗讲解</p>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary btn-lg" id="btn-start">开始学习 →</button>
+                            <button class="btn btn-secondary btn-lg" id="btn-formulas-hero">📐 公式库</button>
                         </div>
                     </div>
 
-                    <div class="welcome-actions">
-                        <button class="btn btn-primary btn-lg" id="btn-start">开始学习 →</button>
+                    <!-- 三大模块入口 -->
+                    <div class="welcome-modules">
+                        <div class="module-card" data-view="basic">
+                            <div class="module-card-tag">入门</div>
+                            <div class="module-icon">📚</div>
+                            <div class="module-title">初级教程</div>
+                            <div class="module-desc">3 个月 12 周完整学习路径，从零到胜任可靠性测试工程师</div>
+                            <div class="module-stats">
+                                <div class="module-stat"><span class="num">12</span>周</div>
+                                <div class="module-stat"><span class="num">165</span>题</div>
+                                <div class="module-stat"><span class="num">12</span>篇教材</div>
+                            </div>
+                            <div class="module-cta">进入学习 →</div>
+                        </div>
+                        <div class="module-card" data-view="advanced">
+                            <div class="module-card-tag">进阶</div>
+                            <div class="module-icon">🚀</div>
+                            <div class="module-title">高级教程</div>
+                            <div class="module-desc">系统建模、失效物理、软件可靠性、认证备考全覆盖</div>
+                            <div class="module-stats">
+                                <div class="module-stat"><span class="num">10</span>主题</div>
+                                <div class="module-stat"><span class="num">14</span>节</div>
+                                <div class="module-stat"><span class="num">80+</span>题</div>
+                            </div>
+                            <div class="module-cta">进入学习 →</div>
+                        </div>
+                        <div class="module-card" data-view="formulas">
+                            <div class="module-card-tag">速查</div>
+                            <div class="module-icon">📐</div>
+                            <div class="module-title">公式库</div>
+                            <div class="module-desc">70+ 可靠性核心公式，每条都有白话讲解和工程应用</div>
+                            <div class="module-stats">
+                                <div class="module-stat"><span class="num">70+</span>公式</div>
+                                <div class="module-stat"><span class="num">13</span>分类</div>
+                                <div class="module-stat"><span class="num">100%</span>通俗</div>
+                            </div>
+                            <div class="module-cta">立即查询 →</div>
+                        </div>
+                    </div>
+
+                    <!-- 学习进度概览 -->
+                    <div class="progress-overview" id="progress-overview">
+                        <div class="progress-overview-title">📊 你的学习进度</div>
+                        <div class="progress-overview-grid">
+                            <div class="progress-overview-card">
+                                <div class="progress-overview-num" id="home-stat-answered">0</div>
+                                <div class="progress-overview-label">已答题目</div>
+                            </div>
+                            <div class="progress-overview-card">
+                                <div class="progress-overview-num text-success" id="home-stat-correct">0</div>
+                                <div class="progress-overview-label">答对</div>
+                            </div>
+                            <div class="progress-overview-card">
+                                <div class="progress-overview-num text-danger" id="home-stat-wrong">0</div>
+                                <div class="progress-overview-label">答错</div>
+                            </div>
+                            <div class="progress-overview-card">
+                                <div class="progress-overview-num text-primary" id="home-stat-accuracy">0%</div>
+                                <div class="progress-overview-label">准确率</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 特色功能 -->
+                    <div class="feature-showcase">
+                        <h3 class="feature-showcase-title">✨ 平台特色</h3>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <div class="feature-item-icon">📖</div>
+                                <div class="feature-item-content">
+                                    <div class="feature-item-title">完整教学</div>
+                                    <div class="feature-item-desc">12 周初级教材 + 10 主题高级进阶，每节配套习题</div>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-item-icon">✅</div>
+                                <div class="feature-item-content">
+                                    <div class="feature-item-title">实时判分</div>
+                                    <div class="feature-item-desc">提交即出分，详尽解析 + 考点标签</div>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-item-icon">📕</div>
+                                <div class="feature-item-content">
+                                    <div class="feature-item-title">错题本</div>
+                                    <div class="feature-item-desc">自动收集错题，针对性复习巩固</div>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-item-icon">📊</div>
+                                <div class="feature-item-content">
+                                    <div class="feature-item-title">进度跟踪</div>
+                                    <div class="feature-item-desc">数据本地保存，随时查看学习状态</div>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-item-icon">🌗</div>
+                                <div class="feature-item-content">
+                                    <div class="feature-item-title">响应式设计</div>
+                                    <div class="feature-item-desc">手机/平板/电脑自适应，随时学习</div>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-item-icon">⚡</div>
+                                <div class="feature-item-content">
+                                    <div class="feature-item-title">离线可用</div>
+                                    <div class="feature-item-desc">纯静态网站，无后端依赖</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="welcome-footer">
+                        <p>💡 建议：先学初级教程掌握基础，再通过高级教程深入提升</p>
                     </div>
                 </div>
 
@@ -191,6 +289,7 @@
     <script src="js/questions_advanced.js"></script>
     <script src="js/advanced.js"></script>
     <script src="js/advanced2.js"></script>
+    <script src="js/basic_curriculum.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
