@@ -142,6 +142,9 @@ function switchView(view) {
             renderAdvancedPage();
             document.getElementById('advanced-page').style.display = 'block';
             break;
+        case 'env':
+            showEnvPage();
+            break;
         case 'formulas':
             showFormulas();
             break;
@@ -186,6 +189,9 @@ function updateSidebar(view) {
     if (view === 'formulas') {
         // 公式库侧边栏：分类导航
         html += renderFormulasSidebar();
+    } else if (view === 'env') {
+        // 环境试验侧边栏：分类导航
+        html += renderEnvSidebar();
     } else if (view === 'basic') {
         html += renderBasicNav();
     } else if (view === 'advanced') {
@@ -307,6 +313,19 @@ function bindSidebarEvents(view) {
                     formulaState.keyword = '';
                     renderFormulaCategories();
                     renderFormulas();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+    } else if (view === 'env') {
+        document.querySelectorAll('.nav-week').forEach(el => {
+            el.addEventListener('click', () => {
+                const cat = el.dataset.envCat;
+                if (cat) {
+                    envState.category = cat;
+                    envState.keyword = '';
+                    renderEnvCategories();
+                    renderEnvList();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             });
@@ -1073,6 +1092,165 @@ function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[c]));
+}
+
+// ========== 环境试验项目库 ==========
+let envState = { category: '全部', keyword: '' };
+
+function showEnvPage() {
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('basic-page').style.display = 'none';
+    document.getElementById('advanced-page').style.display = 'none';
+    document.getElementById('lesson-page').style.display = 'none';
+    document.getElementById('formulas-page').style.display = 'none';
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('result-page').style.display = 'none';
+    document.getElementById('env-page').style.display = 'block';
+
+    updateSidebar('env');
+    renderEnvCategories();
+    renderEnvList();
+
+    const search = document.getElementById('env-search');
+    search.value = envState.keyword;
+    search.oninput = (e) => {
+        envState.keyword = e.target.value.trim();
+        renderEnvList();
+    };
+}
+
+function renderEnvSidebar() {
+    const cats = ['全部', ...new Set(ENVIRONMENT_TESTS.map(t => t.category))];
+    const counts = {};
+    cats.forEach(c => {
+        counts[c] = c === '全部' ? ENVIRONMENT_TESTS.length : ENVIRONMENT_TESTS.filter(t => t.category === c).length;
+    });
+
+    let html = '<nav class="nav"><div class="nav-section">';
+    html += '<div class="nav-section-title">🌡️ 分类</div>';
+    cats.forEach(c => {
+        html += `<a class="nav-week" data-env-cat="${c}">
+            <span class="nav-week-num">${c === '全部' ? '★' : c.substring(0,2)}</span>
+            <span class="nav-week-title">${c}</span>
+            <span class="nav-week-count">${counts[c]}</span>
+        </a>`;
+    });
+    html += '</div></nav>';
+    return html;
+}
+
+function renderEnvCategories() {
+    const cats = ['全部', ...new Set(ENVIRONMENT_TESTS.map(t => t.category))];
+    const container = document.getElementById('env-categories');
+    container.innerHTML = cats.map(c => {
+        const count = c === '全部' ? ENVIRONMENT_TESTS.length : ENVIRONMENT_TESTS.filter(t => t.category === c).length;
+        return `<span class="cat-tag ${envState.category === c ? 'active' : ''}" data-cat="${c}">${c} (${count})</span>`;
+    }).join('');
+
+    container.querySelectorAll('.cat-tag').forEach(el => {
+        el.addEventListener('click', () => {
+            envState.category = el.dataset.cat;
+            envState.keyword = '';
+            document.getElementById('env-search').value = '';
+            renderEnvCategories();
+            renderEnvList();
+        });
+    });
+}
+
+function renderEnvList() {
+    let list = ENVIRONMENT_TESTS.slice();
+
+    if (envState.category !== '全部') {
+        list = list.filter(t => t.category === envState.category);
+    }
+
+    if (envState.keyword) {
+        const kw = envState.keyword.toLowerCase();
+        list = list.filter(t => {
+            return t.name.toLowerCase().includes(kw) ||
+                t.purpose.toLowerCase().includes(kw) ||
+                t.category.toLowerCase().includes(kw) ||
+                t.standards.some(s => s.toLowerCase().includes(kw)) ||
+                t.applications.some(a => a.toLowerCase().includes(kw)) ||
+                t.failureModes.some(f => f.toLowerCase().includes(kw));
+        });
+    }
+
+    const container = document.getElementById('env-list');
+    if (list.length === 0) {
+        container.innerHTML = '<div class="formula-empty">🔍 没有匹配的试验项目</div>';
+        return;
+    }
+
+    container.innerHTML = list.map(t => {
+        const conditions = Object.entries(t.conditions)
+            .map(([k, v]) => `<div class="env-cond-item"><span class="env-cond-label">${k}</span><span class="env-cond-value">${escapeHtml(v)}</span></div>`)
+            .join('');
+        const severity = t.severity.map(s => {
+            const keys = Object.keys(s).filter(k => k !== 'desc');
+            const vals = keys.map(k => `<strong>${k}:</strong> ${escapeHtml(s[k])}`).join(' · ');
+            return `<div class="env-sev-item">${vals || escapeHtml(s.desc)}</div>`;
+        }).join('');
+        const standards = t.standards.map(s => `<span class="env-std">${escapeHtml(s)}</span>`).join('');
+
+        return `
+        <div class="env-card">
+            <div class="env-card-header">
+                <div class="env-card-icon">${t.icon}</div>
+                <div class="env-card-title-area">
+                    <h3>${escapeHtml(t.name)}</h3>
+                    <div class="env-card-cat">${escapeHtml(t.category)}</div>
+                </div>
+            </div>
+            <div class="env-card-body">
+                <div class="env-section">
+                    <div class="env-section-title">📋 试验目的</div>
+                    <p>${escapeHtml(t.purpose)}</p>
+                </div>
+
+                <div class="env-section">
+                    <div class="env-section-title">📏 引用标准</div>
+                    <div class="env-stds">${standards}</div>
+                </div>
+
+                <div class="env-section">
+                    <div class="env-section-title">⚙️ 试验条件</div>
+                    <div class="env-conditions">${conditions}</div>
+                </div>
+
+                <div class="env-section">
+                    <div class="env-section-title">📊 严酷等级</div>
+                    <div class="env-severity">${severity}</div>
+                </div>
+
+                <div class="env-section">
+                    <div class="env-section-title">⚠️ 典型失效模式</div>
+                    <div class="env-failures">
+                        ${t.failureModes.map(f => `<span class="env-failure">${escapeHtml(f)}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="env-section">
+                    <div class="env-section-title">🎯 应用场景</div>
+                    <div class="env-apps">
+                        ${t.applications.map(a => `<span class="env-app">${escapeHtml(a)}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="env-section env-equipment">
+                    <div class="env-section-title">🔧 主要设备</div>
+                    <p>${escapeHtml(t.equipment)}</p>
+                </div>
+
+                <div class="env-section env-tips">
+                    <div class="env-section-title">💡 关键要点</div>
+                    <p>${escapeHtml(t.tips)}</p>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
 }
 
 // ========== 统计与错题本 ==========
